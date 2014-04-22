@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BackgroundObject : MonoBehaviour 
 {
@@ -10,7 +11,7 @@ public class BackgroundObject : MonoBehaviour
 	[HideInInspector]
 	public bool IsMoving = true;
 	[HideInInspector]
-	public int[] XAxisKoords;
+	public List<int> XAxisKoords;
 
 	void Update () 
 	{

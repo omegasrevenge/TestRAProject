@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Services : MonoBehaviour 
 {
 	public const int LOWEST_INDEX = 0;
 
-	public static BackgroundObject SpawnObject(GameSettings.Form form, int[] xKoords, int destination)
+	public static BackgroundObject SpawnObject(GameSettings.Form form, List<int> xKoords, int destination)
 	{
 		Object prefab = new Object ();
 		switch (form) 
@@ -58,124 +59,13 @@ public class Services : MonoBehaviour
 	{
 		for(int yInd = 0; yInd < GameSettings.Y_AXIS_POSITIONS_COUNT; yInd++)
 		{
-			BackgroundObject curObj = GameEngine.Instance.Positions[curX][yInd].content;
-			if(yInd != 0 && curObj != null && GameEngine.Instance.Positions[curX][yInd-1].content == null)
-			{
-				int count1 = GameSettings.Y_AXIS_POSITIONS_COUNT-1;
-				int count2 = GameSettings.Y_AXIS_POSITIONS_COUNT-1;
-				int count3 = GameSettings.Y_AXIS_POSITIONS_COUNT-1;
-				switch(curObj.BackgroundtileForm)
-				{
-				case GameSettings.Form.simple:
-					while(GameEngine.Instance.Positions[curX][count1].content == null)
-					{
-						count1--;
-						if(count1 < LOWEST_INDEX) break;
-					}
-					MoveContent(curX, yInd, curX, count1+1);
-					break;
-				case GameSettings.Form.horizontal:
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
-					{
-						count1--;
-						if(count1 < LOWEST_INDEX) break;
-					}
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[1]][count2].content == null)
-					{
-						count2--;
-						if(count2 < LOWEST_INDEX) break;
-					}
-					MoveContent(curX, yInd, curX, Mathf.Max(count2, count1)+1);
-					break;
-				case GameSettings.Form.vertical:
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
-					{
-						count1--;
-						if(count1 < LOWEST_INDEX) break;
-					}
-					MoveContent(curX, yInd, curX, count1+1);
-					break;
-				case GameSettings.Form.quad:
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
-					{
-						count1--;
-						if(count1 < LOWEST_INDEX) break;
-					}
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[1]][count2].content == null)
-					{
-						count2--;
-						if(count2 < LOWEST_INDEX) break;
-					}
-					MoveContent(curX, yInd, curX, Mathf.Max(count2, count1)+1);
-					break;
-				case GameSettings.Form.giant:
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
-					{
-						count1--;
-						if(count1 < LOWEST_INDEX) break;
-					}
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[1]][count2].content == null)
-					{
-						count2--;
-						if(count2 < LOWEST_INDEX) break;
-					}
-					MoveContent(curX, yInd, curX, Mathf.Max(count2, count1)+1);
-					break;
-				case GameSettings.Form.horizontalLong:
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
-					{
-						count1--;
-						if(count1 < LOWEST_INDEX) break;
-					}
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[1]][count2].content == null)
-					{
-						count2--;
-						if(count2 < LOWEST_INDEX) break;
-					}
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[2]][count3].content == null)
-					{
-						count3--;
-						if(count3 < LOWEST_INDEX) break;
-					}
-					MoveContent(curX, yInd, curX, Mathf.Max(Mathf.Max(count2, count1), count3)+1);
-					break;
-				case GameSettings.Form.verticalLong:
-					while(GameEngine.Instance.Positions[curX][count1].content == null)
-					{
-						count1--;
-						if(count1 < LOWEST_INDEX) break;
-					}
-					MoveContent(curX, yInd, curX, count1+1);
-					break;
-				case GameSettings.Form.immense:
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
-					{
-						count1--;
-						if(count1 < LOWEST_INDEX) break;
-					}
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[1]][count2].content == null)
-					{
-						count2--;
-						if(count2 < LOWEST_INDEX) break;
-					}
-					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[2]][count3].content == null)
-					{
-						count3--;
-						if(count3 < LOWEST_INDEX) break;
-					}
-					MoveContent(curX, yInd, curX, Mathf.Max(Mathf.Max(count2, count1), count3)+1);
-					break;
-				}
-			}
+			ManageContentDisplacement(curX, yInd, curX, FindHighestBlockadeInLanes(GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords)+1);
 		}
 	}
 	
 	
 	public static void DestroyContent(Position target)
 	{
-		//string logCoords = "";
-		//foreach (int cnt in target.content.XAxisKoords) { logCoords += cnt+"."; }
-		//Debug.Log ("xKoords of Obj "+target.content.name.ToString()+": "+logCoords+", array length -> "+target.content.XAxisKoords.Length);
 		DestroyImmediate (target.content.gameObject);
 		GameEngine.Instance.CheckHoles ();
 	}
@@ -196,118 +86,39 @@ public class Services : MonoBehaviour
 			DestroyContent(GameEngine.Instance.Positions[curX][curY]);
 	}
 	
-	public static void MoveContent(int curX, int yOrigin, int newX, int yTarget)
+	public static void ManageContentDisplacement(int curX, int yOrigin, int newX, int yTarget)
 	{
 		int xOrigin = GameEngine.Instance.Positions[curX][yOrigin].content.XAxisKoords[0];
 		int xTarget = xOrigin;
-		BackgroundObject curContent = GameEngine.Instance.Positions [xOrigin] [yOrigin].content;
-		switch(curContent.BackgroundtileForm)
+		MoveContent(xOrigin, yOrigin, xTarget, yTarget, GetDimOfForm(GameEngine.Instance.Positions [xOrigin] [yOrigin].content.BackgroundtileForm));
+	}
+
+	public static void MoveContent(int xOrigin, int yOrigin, int xTarget, int yTarget, int[] dimensions)
+	{
+		int width = dimensions [0];
+		int height = dimensions [1];
+		BackgroundObject tile = GameEngine.Instance.Positions [xOrigin] [yOrigin].content;
+		tile.YDestination = yTarget;
+		for(int index = 0; index < width; index++)
 		{
-		case GameSettings.Form.simple:
-			//current.content.XAxisKoords = new int[]{xTarget};
-			curContent.YDestination = yTarget;
-			GameEngine.Instance.Positions[xTarget][yTarget].content = curContent;
-			GameEngine.Instance.Positions[xOrigin][yOrigin].content = null;
-			break;
-		case GameSettings.Form.horizontal:
-			//current.content.XAxisKoords = new int[]{xTarget, xTarget+1};
-			curContent.YDestination = yTarget;
-			GameEngine.Instance.Positions[xTarget][yTarget].content = curContent;
-			GameEngine.Instance.Positions[xTarget+1][yTarget].content = curContent;
-			GameEngine.Instance.Positions[xOrigin][yOrigin].content = null;
-			GameEngine.Instance.Positions[xOrigin+1][yOrigin].content = null;
-			break;
-		case GameSettings.Form.vertical:
-			//current.content.XAxisKoords = new int[]{xTarget};
-			curContent.YDestination = yTarget;
-			GameEngine.Instance.Positions[xTarget][yTarget].content = curContent;
-			GameEngine.Instance.Positions[xTarget][yTarget+1].content = curContent;
-			if(curContent != GameEngine.Instance.Positions[xOrigin][yOrigin].content)
-				GameEngine.Instance.Positions[xOrigin][yOrigin].content = null;
-			if(yOrigin < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
-				GameEngine.Instance.Positions[xOrigin][yOrigin+1].content = null;
-			break;
-		case GameSettings.Form.quad:
-			//current.content.XAxisKoords = new int[]{xTarget, xTarget+1};
-			curContent.YDestination = yTarget;
-			GameEngine.Instance.Positions[xTarget][yTarget].content = curContent;
-			GameEngine.Instance.Positions[xTarget][yTarget+1].content = curContent;
-			if(curContent != GameEngine.Instance.Positions[xOrigin][yOrigin].content)
-				GameEngine.Instance.Positions[xOrigin][yOrigin].content = null;
-			GameEngine.Instance.Positions[xTarget+1][yTarget].content = curContent;
-			GameEngine.Instance.Positions[xTarget+1][yTarget+1].content = curContent;
-			if(curContent != GameEngine.Instance.Positions[xOrigin][yOrigin].content)
-				GameEngine.Instance.Positions[xOrigin+1][yOrigin].content = null;
-			if(yOrigin < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
+			for(int index2 = 0; index2 < height; index2++)
 			{
-				GameEngine.Instance.Positions[xOrigin+1][yOrigin+1].content = null;
-				GameEngine.Instance.Positions[xOrigin][yOrigin+1].content = null;
-			}
-			break;
-		case GameSettings.Form.giant:
-			curContent.YDestination = yTarget;
-			GameEngine.Instance.Positions[xTarget][yTarget].content = curContent;
-			GameEngine.Instance.Positions[xTarget][yTarget+1].content = curContent;
-			if(yTarget+2 < GameSettings.Y_AXIS_POSITIONS_COUNT)
+				if(index2 + xOrigin < GameSettings.X_AXIS_POSITIONS_COUNT && index + yOrigin < GameSettings.Y_AXIS_POSITIONS_COUNT)
+					GameEngine.Instance.Positions[index2+xOrigin][index+yOrigin].content = null;
+			}	
+		}
+		for(int index3 = 0; index3 < width; index3++)
+		{
+			for(int index4 = 0; index4 < height; index4++)
 			{
-				GameEngine.Instance.Positions[xTarget][yTarget+2].content = curContent;
-				GameEngine.Instance.Positions[xTarget+1][yTarget+2].content = curContent;
-			}
-			for(int gIndex = 0; gIndex < 3; gIndex++)
-			{
-				if(yOrigin < GameSettings.Y_AXIS_POSITIONS_COUNT-gIndex && curContent != GameEngine.Instance.Positions[xOrigin][yOrigin+gIndex].content)
-				{
-					GameEngine.Instance.Positions[xOrigin][yOrigin+gIndex].content = null;
-					GameEngine.Instance.Positions[xOrigin+1][yOrigin+gIndex].content = null;
-				}
-			}
-			break;
-		case GameSettings.Form.horizontalLong:
-			curContent.YDestination = yTarget;
-			for(int hLindex = 0; hLindex < 3; hLindex++)
-			{
-				GameEngine.Instance.Positions[xTarget+hLindex][yTarget].content = curContent;
-				GameEngine.Instance.Positions[xOrigin+hLindex][yOrigin].content = null;
-			}
-			break;
-		case GameSettings.Form.verticalLong:
-			curContent.YDestination = yTarget;
-			GameEngine.Instance.Positions[xTarget][yTarget].content = curContent;
-			GameEngine.Instance.Positions[xTarget][yTarget+1].content = curContent;
-			if(yTarget+2 < GameSettings.Y_AXIS_POSITIONS_COUNT)
-				GameEngine.Instance.Positions[xTarget][yTarget+2].content = curContent;
-			if(curContent != GameEngine.Instance.Positions[xOrigin][yOrigin].content)
-				GameEngine.Instance.Positions[xOrigin][yOrigin].content = null;
-			if(yOrigin < GameSettings.Y_AXIS_POSITIONS_COUNT-1 && curContent != GameEngine.Instance.Positions[xOrigin][yOrigin+1].content)
-				GameEngine.Instance.Positions[xOrigin][yOrigin+1].content = null;
-			if(yOrigin < GameSettings.Y_AXIS_POSITIONS_COUNT-2 && curContent != GameEngine.Instance.Positions[xOrigin][yOrigin+2].content)
-				GameEngine.Instance.Positions[xOrigin][yOrigin+2].content = null;
-			break;
-		case GameSettings.Form.immense:
-			curContent.YDestination = yTarget;
-			GameEngine.Instance.Positions[xTarget][yTarget].content = curContent;
-			GameEngine.Instance.Positions[xTarget][yTarget+1].content = curContent;
-			if(yTarget+2 < GameSettings.Y_AXIS_POSITIONS_COUNT)
-			{
-				for(int iIndex = 0; iIndex < 3; iIndex++)
-					GameEngine.Instance.Positions[xTarget+iIndex][yTarget+2].content = curContent;
-			}
-			for(int iIndex2 = 0; iIndex2 < 3; iIndex2++)
-			{
-				if(yOrigin < GameSettings.Y_AXIS_POSITIONS_COUNT-iIndex2 && curContent != GameEngine.Instance.Positions[xOrigin][yOrigin+iIndex2].content)
-				{
-					for(int iIndex3 = 0; iIndex3 < 3; iIndex3++)
-						GameEngine.Instance.Positions[xOrigin+iIndex3][yOrigin+iIndex2].content = null;
-				}
-			}
-			break;
+				if(index4 + xTarget < GameSettings.X_AXIS_POSITIONS_COUNT && index3 + yTarget < GameSettings.Y_AXIS_POSITIONS_COUNT)
+					GameEngine.Instance.Positions[index4+xTarget][index3+yTarget].content = tile;
+			}	
 		}
 	}
 	
-	public static int FittingForm(int xPos)
+	public static GameSettings.Form FittingForm(int xPos)
 	{
-		if (GameEngine.Instance.Positions [xPos] [GameSettings.Y_AXIS_POSITIONS_COUNT - 1].content != null)
-			return -1;
 		GameSettings.Form tileForm = GameSettings.Form.giant;
 		bool fitting = false;
 		while(!fitting)
@@ -316,244 +127,129 @@ public class Services : MonoBehaviour
 			switch(tileForm)
 			{
 			case GameSettings.Form.simple:
-				fitting = true;
+				fitting = IsFormFitting(xPos, 1);
 				break;
 			case GameSettings.Form.horizontal:
-				fitting = 
-					(xPos < GameSettings.X_AXIS_POSITIONS_COUNT-1 
-					 && GameEngine.Instance.Positions[xPos][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null
-					 && GameEngine.Instance.Positions[xPos+1][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null);
+				fitting = IsFormFitting(xPos, 2);
 				break;
 			case GameSettings.Form.vertical:
-				fitting = true;
+				fitting = IsFormFitting(xPos, 1);
 				break;
 			case GameSettings.Form.quad:
-				fitting = 
-					(xPos < GameSettings.X_AXIS_POSITIONS_COUNT-1 
-					 && GameEngine.Instance.Positions[xPos][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null
-					 && GameEngine.Instance.Positions[xPos+1][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null);
+				fitting = IsFormFitting(xPos, 2);
 				break;
 			case GameSettings.Form.giant:
-				fitting = 
-					(xPos < GameSettings.X_AXIS_POSITIONS_COUNT-1 
-					 && GameEngine.Instance.Positions[xPos][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null
-					 && GameEngine.Instance.Positions[xPos+1][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null);
+				fitting = IsFormFitting(xPos, 2);
 				break;
 			case GameSettings.Form.horizontalLong:
-				fitting = 
-					(xPos < GameSettings.X_AXIS_POSITIONS_COUNT-2 
-					 && GameEngine.Instance.Positions[xPos][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null
-					 && GameEngine.Instance.Positions[xPos+1][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null
-					 && GameEngine.Instance.Positions[xPos+2][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null);
+				fitting = IsFormFitting(xPos, 3);
 				break;
 			case GameSettings.Form.verticalLong:
-				fitting = 
-					(xPos < GameSettings.X_AXIS_POSITIONS_COUNT-2 
-					 && GameEngine.Instance.Positions[xPos][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null
-					 && GameEngine.Instance.Positions[xPos+1][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null
-					 && GameEngine.Instance.Positions[xPos+2][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null);
+				fitting = IsFormFitting(xPos, 1);
 				break;
 			case GameSettings.Form.immense:
-				fitting = 
-					(xPos < GameSettings.X_AXIS_POSITIONS_COUNT-2 
-					 && GameEngine.Instance.Positions[xPos][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null
-					 && GameEngine.Instance.Positions[xPos+1][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null
-					 && GameEngine.Instance.Positions[xPos+2][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content == null);
+				fitting = IsFormFitting(xPos, 3);
 				break;
 			}
 		}
-		return (int)tileForm;
+		return tileForm;
+	}
+
+	public static bool IsFormFitting(int xPos, int width)
+	{
+		if (!(xPos < GameSettings.X_AXIS_POSITIONS_COUNT - width))
+			return false;
+		bool doesntFit = true;
+		for(int index = 0; index < width; index++)
+			doesntFit = doesntFit || GameEngine.Instance.Positions[xPos+index][GameSettings.Y_AXIS_POSITIONS_COUNT-1].content != null;
+		return !doesntFit;
 	}
 	
 	public static void HandleCreationOfNewTile(int currentXKoord)
 	{
 		for(int i = 0; i < GameSettings.Y_AXIS_POSITIONS_COUNT; i++)
 		{
-			int fitting = FittingForm(currentXKoord);
-			//if(fitting < 0) return;
-			GameSettings.Form newTileForm = (GameSettings.Form)fitting;
-			int[] xKoords;
-			int yDest;
-			BackgroundObject newObj;
-			int count1 = GameSettings.Y_AXIS_POSITIONS_COUNT-1;
-			int count2 = GameSettings.Y_AXIS_POSITIONS_COUNT-1;
-			int count3 = GameSettings.Y_AXIS_POSITIONS_COUNT-1;
-			switch(newTileForm)
-			{
-				/////////////////////////
-				/////////////////////////
-				/////////////////////////
-			case GameSettings.Form.simple:
-				xKoords = new int[]{currentXKoord};
-				newObj = SpawnObject(newTileForm, xKoords, i);
-				GameEngine.Instance.Positions[currentXKoord][i].content = newObj;
-				break;
-				/////////////////////////
-				/////////////////////////
-				/////////////////////////
-			case GameSettings.Form.horizontal:
-				while(GameEngine.Instance.Positions[currentXKoord][count1].content == null)
-				{
-					count1--;
-					if(count1 < LOWEST_INDEX) break;
-				}
-				while(GameEngine.Instance.Positions[currentXKoord+1][count2].content == null)
-				{
-					count2--;
-					if(count2 < LOWEST_INDEX) break;
-				}
-				xKoords = new int[]{currentXKoord, currentXKoord+1};
-				yDest = Mathf.Max(count1, count2)+1;
-				newObj = SpawnObject(newTileForm, xKoords, yDest);
-				GameEngine.Instance.Positions[currentXKoord][yDest].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord+1][yDest].content = newObj;
-				break;
-				/////////////////////////
-				/////////////////////////
-				/////////////////////////
-			case GameSettings.Form.vertical:
-				xKoords = new int[]{currentXKoord};
-				newObj = SpawnObject(newTileForm, xKoords, i);
-				if(i < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
-					GameEngine.Instance.Positions[currentXKoord][i+1].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord][i].content = newObj;
-				break;
-				/////////////////////////
-				/////////////////////////
-				/////////////////////////
-			case GameSettings.Form.quad:
-				while(GameEngine.Instance.Positions[currentXKoord][count1].content == null)
-				{
-					count1--;
-					if(count1 < LOWEST_INDEX) break;
-				}
-				while(GameEngine.Instance.Positions[currentXKoord+1][count2].content == null)
-				{
-					count2--;
-					if(count2 < LOWEST_INDEX) break;
-				}
-				xKoords = new int[]{currentXKoord, currentXKoord+1};
-				yDest = Mathf.Max(count1, count2)+1;
-				newObj = SpawnObject(newTileForm, xKoords, yDest);
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
-					GameEngine.Instance.Positions[currentXKoord][yDest+1].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord][yDest].content = newObj;
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
-					GameEngine.Instance.Positions[currentXKoord+1][yDest+1].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord+1][yDest].content = newObj;
-				break;
-				/////////////////////////
-				/////////////////////////
-				/////////////////////////
-			case GameSettings.Form.giant:
-				while(GameEngine.Instance.Positions[currentXKoord][count1].content == null)
-				{
-					count1--;
-					if(count1 < LOWEST_INDEX) break;
-				}
-				while(GameEngine.Instance.Positions[currentXKoord+1][count2].content == null)
-				{
-					count2--;
-					if(count2 < LOWEST_INDEX) break;
-				}
-				xKoords = new int[]{currentXKoord, currentXKoord+1};
-				yDest = Mathf.Max(count1, count2)+1;
-				newObj = SpawnObject(newTileForm, xKoords, yDest);
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-2)
-					GameEngine.Instance.Positions[currentXKoord][yDest+2].content = newObj;
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
-					GameEngine.Instance.Positions[currentXKoord][yDest+1].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord][yDest].content = newObj;
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-2)
-					GameEngine.Instance.Positions[currentXKoord+1][yDest+2].content = newObj;
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
-					GameEngine.Instance.Positions[currentXKoord+1][yDest+1].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord+1][yDest].content = newObj;
-				break;
-				/////////////////////////
-				/////////////////////////
-				/////////////////////////
-			case GameSettings.Form.horizontalLong:
-				while(GameEngine.Instance.Positions[currentXKoord][count1].content == null)
-				{
-					count1--;
-					if(count1 < LOWEST_INDEX) break;
-				}
-				while(GameEngine.Instance.Positions[currentXKoord+1][count2].content == null)
-				{
-					count2--;
-					if(count2 < LOWEST_INDEX) break;
-				}
-				while(GameEngine.Instance.Positions[currentXKoord+2][count3].content == null)
-				{
-					count3--;
-					if(count3 < LOWEST_INDEX) break;
-				}
-				xKoords = new int[]{currentXKoord, currentXKoord+1, currentXKoord+2};
-				yDest = Mathf.Max(Mathf.Max(count1, count2), count3)+1;
-				newObj = SpawnObject(newTileForm, xKoords, yDest);
-				GameEngine.Instance.Positions[currentXKoord][yDest].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord+1][yDest].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord+2][yDest].content = newObj;
-				break;
-				/////////////////////////
-				/////////////////////////
-				/////////////////////////
-			case GameSettings.Form.verticalLong:
-				xKoords = new int[]{currentXKoord};
-				newObj = SpawnObject(newTileForm, xKoords, i);
-				if(i < GameSettings.Y_AXIS_POSITIONS_COUNT-2)
-					GameEngine.Instance.Positions[currentXKoord][i+2].content = newObj;
-				if(i < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
-					GameEngine.Instance.Positions[currentXKoord][i+1].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord][i].content = newObj;
-				break;
-				/////////////////////////
-				/////////////////////////
-				/////////////////////////
-			case GameSettings.Form.immense:
-				while(GameEngine.Instance.Positions[currentXKoord][count1].content == null)
-				{
-					count1--;
-					if(count1 < LOWEST_INDEX) break;
-				}
-				while(GameEngine.Instance.Positions[currentXKoord+1][count2].content == null)
-				{
-					count2--;
-					if(count2 < LOWEST_INDEX) break;
-				}
-				while(GameEngine.Instance.Positions[currentXKoord+2][count3].content == null)
-				{
-					count3--;
-					if(count3 < LOWEST_INDEX) break;
-				}
-				xKoords = new int[]{currentXKoord, currentXKoord+1, currentXKoord+2};
-				yDest = Mathf.Max(Mathf.Max(count1, count2), count3)+1;
-				newObj = SpawnObject(newTileForm, xKoords, yDest);
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-2)
-					GameEngine.Instance.Positions[currentXKoord][yDest+2].content = newObj;
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
-					GameEngine.Instance.Positions[currentXKoord][yDest+1].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord][yDest].content = newObj;
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-2)
-					GameEngine.Instance.Positions[currentXKoord+1][yDest+2].content = newObj;
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
-					GameEngine.Instance.Positions[currentXKoord+1][yDest+1].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord+1][yDest].content = newObj;
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-2)
-					GameEngine.Instance.Positions[currentXKoord+2][yDest+2].content = newObj;
-				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-1)
-					GameEngine.Instance.Positions[currentXKoord+2][yDest+1].content = newObj;
-				GameEngine.Instance.Positions[currentXKoord+2][yDest].content = newObj;
-				break;
-				/////////////////////////
-				/////////////////////////
-				/////////////////////////
-			}
+			GameSettings.Form newTileForm = FittingForm(currentXKoord);
+			RegisterNewTile(currentXKoord, GetDimOfForm(newTileForm), newTileForm);
 		}
 		Debug.Log("HandleCreationOfNewTile being used in XCoord "+currentXKoord+". Putting out Positions:\n"+Services.DebugPositionsString);
 	}
 
+	public static void RegisterNewTile(int curX, int[] dimensions, GameSettings.Form form)
+	{
+		int width = dimensions [0];
+		int height = dimensions [1];
+		List<int> xKoords = new List<int>();
+		for(int index = 0; index < width; index++) xKoords.Add(curX+index);
+		int yDest = FindHighestBlockadeInLanes(xKoords)+1;
+		SetNewTilePositions(width, height, curX, yDest, SpawnObject(form, xKoords, yDest));
+	}
+	
+	public static void SetNewTilePositions(int width, int height, int xCoord, int yDest, BackgroundObject newTile)
+	{
+		for(int index = 0; index < width; index++)
+		{
+			for(int index2 = 0; index2 < height; index2++)
+			{
+				if(yDest < GameSettings.Y_AXIS_POSITIONS_COUNT-index2)
+					GameEngine.Instance.Positions[xCoord+index][yDest+index2].content = newTile;
+			}
+		}
+	}
+	
+	public static int FindHighestBlockadeInLanes(List<int> xCoordinates)
+	{
+		List<int> counters = new List<int> ();
+		for(int j = 0; j < xCoordinates.Count; j++) counters.Add(GameSettings.Y_AXIS_POSITIONS_COUNT-1);
+		for(int index = 0; index < xCoordinates.Count; index++)
+		{
+			while(GameEngine.Instance.Positions[xCoordinates[index]][counters[index]].content == null)
+			{
+				counters[index]--;
+				if(counters[index] < LOWEST_INDEX) break;
+			}
+		}
+		int highestNumber = 0;
+		foreach(int number in counters)
+		{
+			highestNumber = Mathf.Max(highestNumber, number);
+		}
+		return highestNumber;
+	}
+
+	public static int[] GetDimOfForm(GameSettings.Form form)
+	{
+		int[] dim = new int[]{};
+		switch(form)
+		{
+		case GameSettings.Form.simple:
+			dim = new int[]{1,1};
+			break;
+		case GameSettings.Form.horizontal:
+			dim = new int[]{2,1};
+			break;
+		case GameSettings.Form.vertical:
+			dim = new int[]{1,2};
+			break;
+		case GameSettings.Form.quad:
+			dim = new int[]{2,2};
+			break;
+		case GameSettings.Form.giant:
+			dim = new int[]{2,3};
+			break;
+		case GameSettings.Form.horizontalLong:
+			dim = new int[]{3,1};
+			break;
+		case GameSettings.Form.verticalLong:
+			dim = new int[]{1,3};
+			break;
+		case GameSettings.Form.immense:
+			dim = new int[]{3,3};
+			break;
+		}
+		return dim;
+	}
+	
 	public static string DebugPositionsString
 	{
 		get

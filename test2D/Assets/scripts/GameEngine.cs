@@ -34,6 +34,7 @@ public class GameEngine : MonoBehaviour
 			if(Positions[index][Positions[index].Count-1].content == null)
 				Services.HandleCreationOfNewTile(index);
 		}
+		DrawDebugLines (Color.red, Mathf.Infinity);
 	}
 
 	void Update () 
@@ -51,6 +52,25 @@ public class GameEngine : MonoBehaviour
 			// if there is an empty space on the top a new tile should be created to fill it
 			if(Positions[index][Positions[index].Count-1].content == null)
 				Services.HandleCreationOfNewTile(index);
+		}
+	}
+
+	public void DrawDebugLines(Color color, float duration)
+	{
+		for (int index1 = 0; index1 < GameSettings.X_AXIS_POSITIONS_COUNT+1; index1++) 
+		{
+			Debug.DrawLine(
+				new Vector3(index1*GameSettings.X_AXIS_OBJECTS_LENGTH, 0f, 0f), 
+				new Vector3(index1*GameSettings.X_AXIS_OBJECTS_LENGTH, 
+			            GameSettings.X_AXIS_POSITIONS_COUNT*GameSettings.X_AXIS_OBJECTS_LENGTH, 0f), 
+				color, 
+				duration);
+			Debug.DrawLine(
+				new Vector3(0f, index1*GameSettings.X_AXIS_OBJECTS_LENGTH, 0f), 
+				new Vector3(GameSettings.X_AXIS_POSITIONS_COUNT*GameSettings.X_AXIS_OBJECTS_LENGTH, 
+			            index1*GameSettings.X_AXIS_OBJECTS_LENGTH, 0f), 
+				color, 
+				duration);
 		}
 	}
 }
