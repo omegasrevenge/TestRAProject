@@ -3,40 +3,54 @@ using System.Collections;
 
 public class Services : MonoBehaviour 
 {
+	public const int LOWEST_INDEX = 0;
+
 	public static BackgroundObject SpawnObject(GameSettings.Form form, int[] xKoords, int destination)
 	{
-		Object prefab = new Object();
-		switch(form)
+		Object prefab = new Object ();
+		switch (form) 
 		{
-		case GameSettings.Form.simple:
-			prefab = Resources.Load (GameSettings.BACKGROUND_SIMPLE_PREFAB_NAME);
-			break;
-		case GameSettings.Form.horizontal:
-			prefab = Resources.Load (GameSettings.BACKGROUND_HORIZONTAL_PREFAB_NAME);
-			break;
-		case GameSettings.Form.vertical:
-			prefab = Resources.Load (GameSettings.BACKGROUND_VERTICAL_PREFAB_NAME);
-			break;
-		case GameSettings.Form.quad:
-			prefab = Resources.Load (GameSettings.BACKGROUND_QUAD_PREFAB_NAME);
-			break;
-		case GameSettings.Form.giant:
-			prefab = Resources.Load (GameSettings.BACKGROUND_GIANT_PREFAB_NAME);
-			break;
-		case GameSettings.Form.horizontalLong:
-			prefab = Resources.Load (GameSettings.BACKGROUND_HORIZONTALLONG_PREFAB_NAME);
-			break;
-		case GameSettings.Form.verticalLong:
-			prefab = Resources.Load (GameSettings.BACKGROUND_VERTICALLONG_PREFAB_NAME);
-			break;
-		case GameSettings.Form.immense:
-			prefab = Resources.Load (GameSettings.BACKGROUND_IMMENSE_PREFAB_NAME);
-			break;
+			case GameSettings.Form.simple:
+					prefab = Resources.Load (GameSettings.BACKGROUND_SIMPLE_PREFAB_NAME);
+					break;
+			case GameSettings.Form.horizontal:
+					prefab = Resources.Load (GameSettings.BACKGROUND_HORIZONTAL_PREFAB_NAME);
+					break;
+			case GameSettings.Form.vertical:
+					prefab = Resources.Load (GameSettings.BACKGROUND_VERTICAL_PREFAB_NAME);
+					break;
+			case GameSettings.Form.quad:
+					prefab = Resources.Load (GameSettings.BACKGROUND_QUAD_PREFAB_NAME);
+					break;
+			case GameSettings.Form.giant:
+					prefab = Resources.Load (GameSettings.BACKGROUND_GIANT_PREFAB_NAME);
+					break;
+			case GameSettings.Form.horizontalLong:
+					prefab = Resources.Load (GameSettings.BACKGROUND_HORIZONTALLONG_PREFAB_NAME);
+					break;
+			case GameSettings.Form.verticalLong:
+					prefab = Resources.Load (GameSettings.BACKGROUND_VERTICALLONG_PREFAB_NAME);
+					break;
+			case GameSettings.Form.immense:
+					prefab = Resources.Load (GameSettings.BACKGROUND_IMMENSE_PREFAB_NAME);
+					break;
 		}
-		int xKoord = xKoords[0] * GameSettings.X_AXIS_OBJECTS_LENGTH;
+		int xKoord = xKoords [0] * GameSettings.X_AXIS_OBJECTS_LENGTH;
 		GameObject output = (GameObject)Instantiate (prefab, new Vector3 (xKoord, GameEngine.Instance.SpawnHeight, 0f), Quaternion.identity);
-		output.transform.parent = GameEngine.Instance.BackgroundContainer.transform;
+		Transform newRoot;
+		string newRootName = "Lane " + xKoords [0];
+		if (GameEngine.Instance.BackgroundContainer.transform.FindChild (newRootName) == null) 
+		{
+			newRoot = new GameObject (newRootName).transform;
+			newRoot.parent = GameEngine.Instance.BackgroundContainer.transform;
+		} 
+		else
+		{
+			newRoot = GameEngine.Instance.BackgroundContainer.transform.FindChild (newRootName);
+		}
+		output.transform.parent = newRoot;
 		output.GetComponent<BackgroundObject> ().YDestination = destination;
+		output.GetComponent<BackgroundObject> ().XAxisKoords = xKoords;
 		return output.GetComponent<BackgroundObject> ();
 	}
 
@@ -56,7 +70,7 @@ public class Services : MonoBehaviour
 					while(GameEngine.Instance.Positions[curX][count1].content == null)
 					{
 						count1--;
-						if(count1 < 1) break;
+						if(count1 < LOWEST_INDEX) break;
 					}
 					MoveContent(curX, yInd, curX, count1+1);
 					break;
@@ -64,12 +78,12 @@ public class Services : MonoBehaviour
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
 					{
 						count1--;
-						if(count1 < 1) break;
+						if(count1 < LOWEST_INDEX) break;
 					}
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[1]][count2].content == null)
 					{
 						count2--;
-						if(count2 < 1) break;
+						if(count2 < LOWEST_INDEX) break;
 					}
 					MoveContent(curX, yInd, curX, Mathf.Max(count2, count1)+1);
 					break;
@@ -77,7 +91,7 @@ public class Services : MonoBehaviour
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
 					{
 						count1--;
-						if(count1 < 1) break;
+						if(count1 < LOWEST_INDEX) break;
 					}
 					MoveContent(curX, yInd, curX, count1+1);
 					break;
@@ -85,12 +99,12 @@ public class Services : MonoBehaviour
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
 					{
 						count1--;
-						if(count1 < 1) break;
+						if(count1 < LOWEST_INDEX) break;
 					}
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[1]][count2].content == null)
 					{
 						count2--;
-						if(count2 < 1) break;
+						if(count2 < LOWEST_INDEX) break;
 					}
 					MoveContent(curX, yInd, curX, Mathf.Max(count2, count1)+1);
 					break;
@@ -98,12 +112,12 @@ public class Services : MonoBehaviour
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
 					{
 						count1--;
-						if(count1 < 1) break;
+						if(count1 < LOWEST_INDEX) break;
 					}
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[1]][count2].content == null)
 					{
 						count2--;
-						if(count2 < 1) break;
+						if(count2 < LOWEST_INDEX) break;
 					}
 					MoveContent(curX, yInd, curX, Mathf.Max(count2, count1)+1);
 					break;
@@ -111,17 +125,17 @@ public class Services : MonoBehaviour
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
 					{
 						count1--;
-						if(count1 < 1) break;
+						if(count1 < LOWEST_INDEX) break;
 					}
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[1]][count2].content == null)
 					{
 						count2--;
-						if(count2 < 1) break;
+						if(count2 < LOWEST_INDEX) break;
 					}
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[2]][count3].content == null)
 					{
 						count3--;
-						if(count3 < 1) break;
+						if(count3 < LOWEST_INDEX) break;
 					}
 					MoveContent(curX, yInd, curX, Mathf.Max(Mathf.Max(count2, count1), count3)+1);
 					break;
@@ -129,7 +143,7 @@ public class Services : MonoBehaviour
 					while(GameEngine.Instance.Positions[curX][count1].content == null)
 					{
 						count1--;
-						if(count1 < 1) break;
+						if(count1 < LOWEST_INDEX) break;
 					}
 					MoveContent(curX, yInd, curX, count1+1);
 					break;
@@ -137,17 +151,17 @@ public class Services : MonoBehaviour
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[0]][count1].content == null)
 					{
 						count1--;
-						if(count1 < 1) break;
+						if(count1 < LOWEST_INDEX) break;
 					}
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[1]][count2].content == null)
 					{
 						count2--;
-						if(count2 < 1) break;
+						if(count2 < LOWEST_INDEX) break;
 					}
 					while(GameEngine.Instance.Positions[GameEngine.Instance.Positions[curX][yInd].content.XAxisKoords[2]][count3].content == null)
 					{
 						count3--;
-						if(count3 < 1) break;
+						if(count3 < LOWEST_INDEX) break;
 					}
 					MoveContent(curX, yInd, curX, Mathf.Max(Mathf.Max(count2, count1), count3)+1);
 					break;
@@ -159,7 +173,10 @@ public class Services : MonoBehaviour
 	
 	public static void DestroyContent(Position target)
 	{
-		DestroyImmediate (target.content);
+		//string logCoords = "";
+		//foreach (int cnt in target.content.XAxisKoords) { logCoords += cnt+"."; }
+		//Debug.Log ("xKoords of Obj "+target.content.name.ToString()+": "+logCoords+", array length -> "+target.content.XAxisKoords.Length);
+		DestroyImmediate (target.content.gameObject);
 		GameEngine.Instance.CheckHoles ();
 	}
 
@@ -353,7 +370,7 @@ public class Services : MonoBehaviour
 		for(int i = 0; i < GameSettings.Y_AXIS_POSITIONS_COUNT; i++)
 		{
 			int fitting = FittingForm(currentXKoord);
-			if(fitting < 0) return;
+			//if(fitting < 0) return;
 			GameSettings.Form newTileForm = (GameSettings.Form)fitting;
 			int[] xKoords;
 			int yDest;
@@ -378,12 +395,12 @@ public class Services : MonoBehaviour
 				while(GameEngine.Instance.Positions[currentXKoord][count1].content == null)
 				{
 					count1--;
-					if(count1 < 1) break;
+					if(count1 < LOWEST_INDEX) break;
 				}
 				while(GameEngine.Instance.Positions[currentXKoord+1][count2].content == null)
 				{
 					count2--;
-					if(count2 < 1) break;
+					if(count2 < LOWEST_INDEX) break;
 				}
 				xKoords = new int[]{currentXKoord, currentXKoord+1};
 				yDest = Mathf.Max(count1, count2)+1;
@@ -408,12 +425,12 @@ public class Services : MonoBehaviour
 				while(GameEngine.Instance.Positions[currentXKoord][count1].content == null)
 				{
 					count1--;
-					if(count1 < 1) break;
+					if(count1 < LOWEST_INDEX) break;
 				}
 				while(GameEngine.Instance.Positions[currentXKoord+1][count2].content == null)
 				{
 					count2--;
-					if(count2 < 1) break;
+					if(count2 < LOWEST_INDEX) break;
 				}
 				xKoords = new int[]{currentXKoord, currentXKoord+1};
 				yDest = Mathf.Max(count1, count2)+1;
@@ -432,12 +449,12 @@ public class Services : MonoBehaviour
 				while(GameEngine.Instance.Positions[currentXKoord][count1].content == null)
 				{
 					count1--;
-					if(count1 < 1) break;
+					if(count1 < LOWEST_INDEX) break;
 				}
 				while(GameEngine.Instance.Positions[currentXKoord+1][count2].content == null)
 				{
 					count2--;
-					if(count2 < 1) break;
+					if(count2 < LOWEST_INDEX) break;
 				}
 				xKoords = new int[]{currentXKoord, currentXKoord+1};
 				yDest = Mathf.Max(count1, count2)+1;
@@ -460,17 +477,17 @@ public class Services : MonoBehaviour
 				while(GameEngine.Instance.Positions[currentXKoord][count1].content == null)
 				{
 					count1--;
-					if(count1 < 1) break;
+					if(count1 < LOWEST_INDEX) break;
 				}
 				while(GameEngine.Instance.Positions[currentXKoord+1][count2].content == null)
 				{
 					count2--;
-					if(count2 < 1) break;
+					if(count2 < LOWEST_INDEX) break;
 				}
 				while(GameEngine.Instance.Positions[currentXKoord+2][count3].content == null)
 				{
 					count3--;
-					if(count3 < 1) break;
+					if(count3 < LOWEST_INDEX) break;
 				}
 				xKoords = new int[]{currentXKoord, currentXKoord+1, currentXKoord+2};
 				yDest = Mathf.Max(Mathf.Max(count1, count2), count3)+1;
@@ -498,17 +515,17 @@ public class Services : MonoBehaviour
 				while(GameEngine.Instance.Positions[currentXKoord][count1].content == null)
 				{
 					count1--;
-					if(count1 < 1) break;
+					if(count1 < LOWEST_INDEX) break;
 				}
 				while(GameEngine.Instance.Positions[currentXKoord+1][count2].content == null)
 				{
 					count2--;
-					if(count2 < 1) break;
+					if(count2 < LOWEST_INDEX) break;
 				}
 				while(GameEngine.Instance.Positions[currentXKoord+2][count3].content == null)
 				{
 					count3--;
-					if(count3 < 1) break;
+					if(count3 < LOWEST_INDEX) break;
 				}
 				xKoords = new int[]{currentXKoord, currentXKoord+1, currentXKoord+2};
 				yDest = Mathf.Max(Mathf.Max(count1, count2), count3)+1;
@@ -533,6 +550,30 @@ public class Services : MonoBehaviour
 				/////////////////////////
 				/////////////////////////
 			}
+		}
+		Debug.Log("HandleCreationOfNewTile being used in XCoord "+currentXKoord+". Putting out Positions:\n"+Services.DebugPositionsString);
+	}
+
+	public static string DebugPositionsString
+	{
+		get
+		{
+			if (GameEngine.Instance == null || GameEngine.Instance.Positions == null) return "";
+			string output = "";
+			for (int i = GameSettings.Y_AXIS_POSITIONS_COUNT-1; i >= 0; i--) 
+			{
+				for(int j = 0; j < GameSettings.X_AXIS_POSITIONS_COUNT; j++) 
+				{
+					if(GameEngine.Instance.Positions[j][i].content == null)
+					{
+						output += "x";
+						continue;
+					}
+					output += (int)GameEngine.Instance.Positions[j][i].content.BackgroundtileForm;
+				}
+				output += "\n";
+			}
+			return output;
 		}
 	}
 }

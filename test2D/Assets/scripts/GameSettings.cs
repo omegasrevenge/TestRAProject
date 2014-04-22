@@ -11,7 +11,7 @@ public class GameSettings : MonoBehaviour
 	public const string BACKGROUND_HORIZONTALLONG_PREFAB_NAME = "BackgroundTileHorizontalLong";
 	public const string BACKGROUND_VERTICALLONG_PREFAB_NAME = "BackgroundTileVerticalLong";
 	public const string BACKGROUND_IMMENSE_PREFAB_NAME = "BackgroundTileImmense";
-	public const float BACKGROUND_TILE_MOVEMENT_SPEED = 300;
+	public const float BACKGROUND_TILE_MOVEMENT_SPEED = 500;
 	
 	public const int X_AXIS_POSITIONS_COUNT = 10;
 	public const int Y_AXIS_POSITIONS_COUNT = 10;
