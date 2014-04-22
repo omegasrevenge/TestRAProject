@@ -2,11 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Services : MonoBehaviour 
+public class Services
 {
 	public const int LOWEST_INDEX = 0;
 
-	public static BackgroundObject SpawnObject(GameSettings.Form form, List<int> xKoords, int destination)
+	public BackgroundObject SpawnObject(GameSettings.Form form, List<int> xKoords, int destination)
 	{
 		Object prefab = new Object ();
 		switch (form) 
@@ -37,7 +37,7 @@ public class Services : MonoBehaviour
 					break;
 		}
 		int xKoord = xKoords [0] * GameSettings.X_AXIS_OBJECTS_LENGTH;
-		GameObject output = (GameObject)Instantiate (prefab, new Vector3 (xKoord, GameEngine.Instance.SpawnHeight, 0f), Quaternion.identity);
+		GameObject output = (GameObject)GameEngine.Instantiate (prefab, new Vector3 (xKoord, GameEngine.Instance.SpawnHeight, 0f), Quaternion.identity);
 		Transform newRoot;
 		string newRootName = "Lane " + xKoords [0];
 		if (GameEngine.Instance.BackgroundContainer.transform.FindChild (newRootName) == null) 
@@ -55,7 +55,7 @@ public class Services : MonoBehaviour
 		return output.GetComponent<BackgroundObject> ();
 	}
 
-	public static void HandleGravity(int curX)
+	public void HandleGravity(int curX)
 	{
 		for(int yInd = 0; yInd < GameSettings.Y_AXIS_POSITIONS_COUNT; yInd++)
 		{
@@ -64,13 +64,13 @@ public class Services : MonoBehaviour
 	}
 	
 	
-	public static void DestroyContent(Position target)
+	public void DestroyContent(Position target)
 	{
-		DestroyImmediate (target.content.gameObject);
+		GameEngine.DestroyImmediate (target.content.gameObject);
 		GameEngine.Instance.CheckHoles ();
 	}
 
-	public static void ManagePosition()
+	public void ManagePosition()
 	{
 		Vector3 screenMousePos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		int curX = (int)screenMousePos.x/GameSettings.X_AXIS_OBJECTS_LENGTH;
@@ -86,14 +86,14 @@ public class Services : MonoBehaviour
 			DestroyContent(GameEngine.Instance.Positions[curX][curY]);
 	}
 	
-	public static void ManageContentDisplacement(int curX, int yOrigin, int newX, int yTarget)
+	public void ManageContentDisplacement(int curX, int yOrigin, int newX, int yTarget)
 	{
 		int xOrigin = GameEngine.Instance.Positions[curX][yOrigin].content.XAxisKoords[0];
 		int xTarget = xOrigin;
 		MoveContent(xOrigin, yOrigin, xTarget, yTarget, GetDimOfForm(GameEngine.Instance.Positions [xOrigin] [yOrigin].content.BackgroundtileForm));
 	}
 
-	public static void MoveContent(int xOrigin, int yOrigin, int xTarget, int yTarget, int[] dimensions)
+	public void MoveContent(int xOrigin, int yOrigin, int xTarget, int yTarget, int[] dimensions)
 	{
 		int width = dimensions [0];
 		int height = dimensions [1];
@@ -117,7 +117,7 @@ public class Services : MonoBehaviour
 		}
 	}
 	
-	public static GameSettings.Form FittingForm(int xPos)
+	public GameSettings.Form FittingForm(int xPos)
 	{
 		GameSettings.Form tileForm = GameSettings.Form.giant;
 		bool fitting = false;
@@ -155,7 +155,7 @@ public class Services : MonoBehaviour
 		return tileForm;
 	}
 
-	public static bool IsFormFitting(int xPos, int width)
+	public bool IsFormFitting(int xPos, int width)
 	{
 		if (!(xPos < GameSettings.X_AXIS_POSITIONS_COUNT - width))
 			return false;
@@ -165,17 +165,17 @@ public class Services : MonoBehaviour
 		return !doesntFit;
 	}
 	
-	public static void HandleCreationOfNewTile(int currentXKoord)
+	public void HandleCreationOfNewTile(int currentXKoord)
 	{
 		for(int i = 0; i < GameSettings.Y_AXIS_POSITIONS_COUNT; i++)
 		{
 			GameSettings.Form newTileForm = FittingForm(currentXKoord);
 			RegisterNewTile(currentXKoord, GetDimOfForm(newTileForm), newTileForm);
 		}
-		Debug.Log("HandleCreationOfNewTile being used in XCoord "+currentXKoord+". Putting out Positions:\n"+Services.DebugPositionsString);
+		Debug.Log("HandleCreationOfNewTile being used in XCoord "+currentXKoord+". Putting out Positions:\n"+DebugPositionsString);
 	}
 
-	public static void RegisterNewTile(int curX, int[] dimensions, GameSettings.Form form)
+	public void RegisterNewTile(int curX, int[] dimensions, GameSettings.Form form)
 	{
 		int width = dimensions [0];
 		int height = dimensions [1];
@@ -185,7 +185,7 @@ public class Services : MonoBehaviour
 		SetNewTilePositions(width, height, curX, yDest, SpawnObject(form, xKoords, yDest));
 	}
 	
-	public static void SetNewTilePositions(int width, int height, int xCoord, int yDest, BackgroundObject newTile)
+	public void SetNewTilePositions(int width, int height, int xCoord, int yDest, BackgroundObject newTile)
 	{
 		for(int index = 0; index < width; index++)
 		{
@@ -197,7 +197,7 @@ public class Services : MonoBehaviour
 		}
 	}
 	
-	public static int FindHighestBlockadeInLanes(List<int> xCoordinates)
+	public int FindHighestBlockadeInLanes(List<int> xCoordinates)
 	{
 		List<int> counters = new List<int> ();
 		for(int j = 0; j < xCoordinates.Count; j++) counters.Add(GameSettings.Y_AXIS_POSITIONS_COUNT-1);
@@ -217,7 +217,7 @@ public class Services : MonoBehaviour
 		return highestNumber;
 	}
 
-	public static int[] GetDimOfForm(GameSettings.Form form)
+	public int[] GetDimOfForm(GameSettings.Form form)
 	{
 		int[] dim = new int[]{};
 		switch(form)
@@ -250,7 +250,7 @@ public class Services : MonoBehaviour
 		return dim;
 	}
 	
-	public static string DebugPositionsString
+	public string DebugPositionsString
 	{
 		get
 		{

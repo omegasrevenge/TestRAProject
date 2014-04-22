@@ -8,6 +8,7 @@ public class GameEngine : MonoBehaviour
 	public int SpawnHeight;
 
 	public static GameEngine Instance;
+	public static Services MyServices;
 
 	public List<List<Position>> Positions;
 
@@ -18,6 +19,7 @@ public class GameEngine : MonoBehaviour
 		Application.targetFrameRate = 30;
 		Application.runInBackground = false;
 		Instance = this;
+		MyServices = new Services ();
 
 		Positions = new List<List<Position>> ();
 		
@@ -32,7 +34,7 @@ public class GameEngine : MonoBehaviour
 		for(int index = 0; index < GameSettings.X_AXIS_POSITIONS_COUNT; index++)
 		{
 			if(Positions[index][Positions[index].Count-1].content == null)
-				Services.HandleCreationOfNewTile(index);
+				MyServices.HandleCreationOfNewTile(index);
 		}
 		DrawDebugLines (Color.red, Mathf.Infinity);
 	}
@@ -40,18 +42,18 @@ public class GameEngine : MonoBehaviour
 	void Update () 
 	{
 		if (Input.GetMouseButtonDown(0))
-			Services.ManagePosition();
+			MyServices.ManagePosition();
 	}
 
 	public void CheckHoles()
 	{
 		for(int index = 0; index < GameSettings.X_AXIS_POSITIONS_COUNT; index++)
 		{
-			Services.HandleGravity(index);
+			MyServices.HandleGravity(index);
 
 			// if there is an empty space on the top a new tile should be created to fill it
 			if(Positions[index][Positions[index].Count-1].content == null)
-				Services.HandleCreationOfNewTile(index);
+				MyServices.HandleCreationOfNewTile(index);
 		}
 	}
 
