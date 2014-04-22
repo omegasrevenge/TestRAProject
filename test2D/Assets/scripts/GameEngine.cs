@@ -19,7 +19,7 @@ public class GameEngine : MonoBehaviour
 		Application.targetFrameRate = 30;
 		Application.runInBackground = false;
 		Instance = this;
-		MyServices = new Services ();
+		MyServices = (Services)gameObject.AddComponent("Services");
 
 		Positions = new List<List<Position>> ();
 		
@@ -55,6 +55,26 @@ public class GameEngine : MonoBehaviour
 			if(Positions[index][Positions[index].Count-1].content == null)
 				MyServices.HandleCreationOfNewTile(index);
 		}
+	}
+
+	public string DebugPositionsString()
+	{
+		if (GameEngine.Instance == null || GameEngine.Instance.Positions == null) return "";
+		string output = "";
+		for (int i = GameSettings.Y_AXIS_POSITIONS_COUNT-1; i >= 0; i--) 
+		{
+			for(int j = 0; j < GameSettings.X_AXIS_POSITIONS_COUNT; j++) 
+			{
+				if(GameEngine.Instance.Positions[j][i].content == null)
+				{
+					output += "x";
+					continue;
+				}
+				output += (int)GameEngine.Instance.Positions[j][i].content.BackgroundtileForm;
+			}
+			output += "\n";
+		}
+		return output;
 	}
 
 	public void DrawDebugLines(Color color, float duration)
